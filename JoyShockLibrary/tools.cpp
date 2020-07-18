@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <algorithm>
 
 //#include <curl/curl.h>
 
@@ -50,14 +51,9 @@ int16_t combine_gyro_data(uint8_t a, uint8_t b) {
 	return d;
 }
 
-float clamp(float a, float min, float max) {
-	if (a < min) {
-		return min;
-	} else if (a > max) {
-		return max;
-	} else {
-		return a;
-	}
+template <typename T>
+T clamp(const T& n, const T& lower, const T& upper) {
+  return std::max(lower, std::min(n, upper));
 }
 
 unsigned createMask(unsigned a, unsigned b) {

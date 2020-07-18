@@ -18,7 +18,7 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 	jc->last_imu_state = jc->imu_state;
 	// delta time
 	auto time_now = std::chrono::steady_clock::now();
-	jc->delta_time = ((float)std::chrono::duration_cast<std::chrono::microseconds>(time_now - jc->last_polled).count()) / 1000000.0;
+	jc->delta_time = ((float)std::chrono::duration_cast<std::chrono::microseconds>(time_now - jc->last_polled).count()) / 1000000.0f;
 	jc->last_polled = time_now;
 	// ds4
 	if (jc->is_ds4) {
@@ -48,13 +48,13 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			}
 
 			// convert to real units
-			jc->imu_state.gyroX = (float)(gyroSampleY) * -(2000.0 / 32767.0);
-			jc->imu_state.gyroY = (float)(gyroSampleZ) * (2000.0 / 32767.0);
-			jc->imu_state.gyroZ = (float)(gyroSampleX) * (2000.0 / 32767.0);
+			jc->imu_state.gyroX = (float)(gyroSampleY) * -(2000.0f / 32767.0f);
+			jc->imu_state.gyroY = (float)(gyroSampleZ) * (2000.0f / 32767.0f);
+			jc->imu_state.gyroZ = (float)(gyroSampleX) * (2000.0f / 32767.0f);
 
-			jc->imu_state.accelX = (float)(accelSampleX) / 8192.0;
-			jc->imu_state.accelZ = (float)(accelSampleY) / -8192.0;
-			jc->imu_state.accelY = (float)(accelSampleZ) / 8192.0;
+			jc->imu_state.accelX = (float)(accelSampleX) / 8192.0f;
+			jc->imu_state.accelZ = (float)(accelSampleY) / -8192.0f;
+			jc->imu_state.accelY = (float)(accelSampleZ) / 8192.0f;
 
 			//printf("DS4 accel: %.4f, %.4f, %.4f\n", jc->imu_state.accelX, jc->imu_state.accelY, jc->imu_state.accelZ);
 
@@ -98,10 +98,10 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			uint16_t stick2_y = packet[indexOffset+4];
 			stick2_y = 255 - stick2_y;
 
-			jc->simple_state.stickLX = (std::fmin)(1.0, (stick_x - 127.0) / 127.0);
-			jc->simple_state.stickLY = (std::fmin)(1.0, (stick_y - 127.0) / 127.0);
-			jc->simple_state.stickRX = (std::fmin)(1.0, (stick2_x - 127.0) / 127.0);
-			jc->simple_state.stickRY = (std::fmin)(1.0, (stick2_y - 127.0) / 127.0);
+			jc->simple_state.stickLX = (std::fmin)(1.0f, (stick_x - 127.0f) / 127.0f);
+			jc->simple_state.stickLY = (std::fmin)(1.0f, (stick_y - 127.0f) / 127.0f);
+			jc->simple_state.stickRX = (std::fmin)(1.0f, (stick2_x - 127.0f) / 127.0f);
+			jc->simple_state.stickRY = (std::fmin)(1.0f, (stick2_y - 127.0f) / 127.0f);
 
 			if (jc->use_continuous_calibration) {
 				jc->push_sensor_samples(jc->imu_state.gyroX, jc->imu_state.gyroY, jc->imu_state.gyroZ);
@@ -259,9 +259,9 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			float accelX = accelSampleX;
 			float accelY = accelSampleY;
 			float accelZ = accelSampleZ;
-			float roll = gyroSampleX - jc->sensor_cal[1][0];
-			float pitch = gyroSampleY - jc->sensor_cal[1][1];
-			float yaw = gyroSampleZ - jc->sensor_cal[1][2];
+			float roll = (float)(gyroSampleX - jc->sensor_cal[1][0]);
+			float pitch = (float)(gyroSampleY - jc->sensor_cal[1][1]);
+			float yaw = (float)(gyroSampleZ - jc->sensor_cal[1][2]);
 			// each packet actually has 3 samples worth of data, so collect sample 2
 			accelSampleY = uint16_to_int16(packet[25] | (packet[26] << 8) & 0xFF00);
 			accelSampleX = uint16_to_int16(packet[27] | (packet[28] << 8) & 0xFF00);
@@ -297,12 +297,12 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			roll /= 3;
 			pitch /= 3;
 			yaw /= 3;
-			jc->imu_state.accelX = (float)(accelX) / -4096.0;
-			jc->imu_state.accelY = (float)(accelY) / -4096.0;
-			jc->imu_state.accelZ = (float)(accelZ) / -4096.0;
-			jc->imu_state.gyroZ = (float)(roll) * (2294.0 / 32767.0);
-			jc->imu_state.gyroX = (float)(pitch) * (2294.0 / 32767.0);
-			jc->imu_state.gyroY = (float)(yaw) * (2294.0 / 32767.0);
+			jc->imu_state.accelX = (float)(accelX) / -4096.0f;
+			jc->imu_state.accelY = (float)(accelY) / -4096.0f;
+			jc->imu_state.accelZ = (float)(accelZ) / -4096.0f;
+			jc->imu_state.gyroZ = (float)(roll) * (2294.0f / 32767.0f);
+			jc->imu_state.gyroX = (float)(pitch) * (2294.0f / 32767.0f);
+			jc->imu_state.gyroY = (float)(yaw) * (2294.0f / 32767.0f);
 
 			//printf("Switch accel: %.4f, %.4f, %.4f\n", jc->imu_state.accelX, jc->imu_state.accelY, jc->imu_state.accelZ);
 
@@ -330,7 +330,7 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			jc->simple_state.buttons |= ((buttons_pressed >> 8) << JSOFFSET_MINUS) & JSMASK_MINUS;
 			jc->simple_state.buttons |= ((buttons_pressed >> 6) << JSOFFSET_L) & JSMASK_L;
 			jc->simple_state.buttons |= ((buttons_pressed >> 13) << JSOFFSET_CAPTURE) & JSMASK_CAPTURE;
-			jc->simple_state.lTrigger = (buttons_pressed >> 7) & 1;
+			jc->simple_state.lTrigger = (float)((buttons_pressed >> 7) & 1);
 			jc->simple_state.buttons |= ((int)(jc->simple_state.lTrigger) << JSOFFSET_ZL) & JSMASK_ZL;
 			jc->simple_state.buttons |= ((buttons_pressed >> 5) << JSOFFSET_SL) & JSMASK_SL;
 			jc->simple_state.buttons |= ((buttons_pressed >> 4) << JSOFFSET_SR) & JSMASK_SR;
@@ -349,7 +349,7 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			jc->simple_state.buttons |= ((buttons_pressed >> 25) << JSOFFSET_PLUS) & JSMASK_PLUS;
 			jc->simple_state.buttons |= ((buttons_pressed >> 22) << JSOFFSET_R) & JSMASK_R;
 			jc->simple_state.buttons |= ((buttons_pressed >> 28) << JSOFFSET_HOME) & JSMASK_HOME;
-			jc->simple_state.rTrigger = (buttons_pressed >> 23) & 1;
+			jc->simple_state.rTrigger = (float)((buttons_pressed >> 23) & 1);
 			jc->simple_state.buttons |= ((int)(jc->simple_state.rTrigger) << JSOFFSET_ZR) & JSMASK_ZR;
 			jc->simple_state.buttons |= ((buttons_pressed >> 21) << JSOFFSET_SL) & JSMASK_SL;
 			jc->simple_state.buttons |= ((buttons_pressed >> 20) << JSOFFSET_SR) & JSMASK_SR;
@@ -379,8 +379,8 @@ bool handle_input(JoyShock *jc, uint8_t *packet, int len, bool &hasIMU) {
 			jc->simple_state.buttons |= ((buttons_pressed >> 6) << JSOFFSET_L) & JSMASK_L;
 			jc->simple_state.buttons |= ((buttons_pressed >> 28) << JSOFFSET_HOME) & JSMASK_HOME;
 			jc->simple_state.buttons |= ((buttons_pressed >> 13) << JSOFFSET_CAPTURE) & JSMASK_CAPTURE;
-			jc->simple_state.rTrigger = (buttons_pressed >> 23) & 1;
-			jc->simple_state.lTrigger = (buttons_pressed >> 7) & 1;
+			jc->simple_state.rTrigger = (float)((buttons_pressed >> 23) & 1);
+			jc->simple_state.lTrigger = (float)((buttons_pressed >> 7) & 1);
 			jc->simple_state.buttons |= ((int)(jc->simple_state.lTrigger) << JSOFFSET_ZL) & JSMASK_ZL;
 			jc->simple_state.buttons |= ((int)(jc->simple_state.rTrigger) << JSOFFSET_ZR) & JSMASK_ZR;
 

@@ -141,11 +141,6 @@ int JslConnectDevices()
 		JslDisconnectAndDisposeAll();
 	}
 
-	// most of the joycon and pro controller stuff here is thanks to mfosse's vjoy feeder
-	int read;	// number of bytes read
-	int written;// number of bytes written
-	const char *device_name;
-
 	// Enumerate and print the HID devices on the system
 	struct hid_device_info *devs, *cur_dev;
 
@@ -468,15 +463,15 @@ float JslGetStickStep(int deviceId)
 	JoyShock* jc = GetJoyShockFromHandle(deviceId);
 	if (jc != nullptr) {
 		if (jc->is_ds4) {
-			return 1.0 / 128.0;
+			return 1.0f / 128.0f;
 		}
 		else {
 			if (jc->left_right == 2) // right joycon has no calibration for left stick
 			{
-				return 1.0 / (jc->stick_cal_x_r[2] - jc->stick_cal_x_r[1]);
+				return 1.0f / (jc->stick_cal_x_r[2] - jc->stick_cal_x_r[1]);
 			}
 			else {
-				return 1.0 / (jc->stick_cal_x_l[2] - jc->stick_cal_x_l[1]);
+				return 1.0f / (jc->stick_cal_x_l[2] - jc->stick_cal_x_l[1]);
 			}
 		}
 	}
@@ -486,7 +481,7 @@ float JslGetTriggerStep(int deviceId)
 {
 	JoyShock* jc = GetJoyShockFromHandle(deviceId);
 	if (jc != nullptr) {
-		return jc->is_ds4 ? 1 / 256.0 : 1.0;
+		return jc->is_ds4 ? 1.0f / 256.0f : 1.0f;
 	}
 	return 1.0f;
 }
@@ -494,7 +489,7 @@ float JslGetPollRate(int deviceId)
 {
 	JoyShock* jc = GetJoyShockFromHandle(deviceId);
 	if (jc != nullptr) {
-		return jc->is_ds4 ? 250.0 : 66.6667;
+		return jc->is_ds4 ? 250.0f : 66.6667f;
 	}
 	return 0.0f;
 }
